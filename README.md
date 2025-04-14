@@ -3,7 +3,6 @@
 local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local MinimizedFrame = Instance.new("Frame") -- Small movable square when minimized
-local FlyGui = Instance.new("ScreenGui") -- Dedicated Fly GUI
 
 ScreenGui.Name = "CustomScript"
 ScreenGui.Parent = game.CoreGui
@@ -13,6 +12,18 @@ Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
 Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
 Frame.Size = UDim2.new(0, 300, 0, 200)
+
+-- Close button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = Frame
+CloseButton.Text = "X"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 1, -35)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
 
 -- Minimized Square
 MinimizedFrame.Name = "MinimizedFrame"
@@ -105,26 +116,42 @@ local TrollFrame = createTabFrame()
 local PlayerFrame = createTabFrame()
 local OthersFrame = createTabFrame()
 
-local function createBackButton(tabFrame)
-    local BackButton = Instance.new("TextButton")
-    BackButton.Parent = tabFrame
-    BackButton.Text = "Back"
-    BackButton.Size = UDim2.new(0, 80, 0, 30)
-    BackButton.Position = UDim2.new(0, 10, 0, 10)
-    BackButton.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+createTabButton("Back", "Back", UDim2.new(0, 10, 0, 10)).MouseButton1Click:Connect(function()
+    TrollFrame.Visible = false
+    PlayerFrame.Visible = false
+    OthersFrame.Visible = false
+    Frame.Visible = true
+end)
 
-    BackButton.MouseButton1Click:Connect(function()
-        tabFrame.Visible = false
-        Frame.Visible = true
-    end)
-end
+-- Functions to open tabs
+TrollTab.MouseButton1Click:Connect(function()
+    TrollFrame.Visible = true
+    PlayerFrame.Visible = false
+    OthersFrame.Visible = false
+    Frame.Visible = false
+end)
 
-createBackButton(TrollFrame)
-createBackButton(PlayerFrame)
-createBackButton(OthersFrame)
+PlayerTab.MouseButton1Click:Connect(function()
+    TrollFrame.Visible = false
+    PlayerFrame.Visible = true
+    OthersFrame.Visible = false
+    Frame.Visible = false
+end)
 
--- Void Player functionality with ON/OFF button
-local voidActive = false
+OthersTab.MouseButton1Click:Connect(function()
+    TrollFrame.Visible = false
+    PlayerFrame.Visible = false
+    OthersFrame.Visible = true
+    Frame.Visible = false
+end)
+
+-- Troll functionalities (Void & View Player)
+local PlayerNameBox = Instance.new("TextBox")
+PlayerNameBox.Parent = TrollFrame
+PlayerNameBox.PlaceholderText = "Enter Player Name"
+PlayerNameBox.Size = UDim2.new(0, 150, 0, 30)
+PlayerNameBox.Position = UDim2.new(0, 10, 0, 10)
+
 local VoidButton = Instance.new("TextButton")
 VoidButton.Parent = TrollFrame
 VoidButton.Text = "Void Player (ON/OFF)"
@@ -132,12 +159,9 @@ VoidButton.Size = UDim2.new(0, 150, 0, 30)
 VoidButton.Position = UDim2.new(0, 10, 0, 50)
 
 VoidButton.MouseButton1Click:Connect(function()
-    voidActive = not voidActive
-    VoidButton.Text = voidActive and "Void Player (ON)" or "Void Player (OFF)"
+    -- Void logic
 end)
 
--- View Player functionality with ON/OFF button
-local viewing = false
 local ViewButton = Instance.new("TextButton")
 ViewButton.Parent = TrollFrame
 ViewButton.Text = "View Player (ON/OFF)"
@@ -145,39 +169,5 @@ ViewButton.Size = UDim2.new(0, 150, 0, 30)
 ViewButton.Position = UDim2.new(0, 10, 0, 90)
 
 ViewButton.MouseButton1Click:Connect(function()
-    viewing = not viewing
-    ViewButton.Text = viewing and "View Player (ON)" or "View Player (OFF)"
-
-    if viewing then
-        local targetPlayer = game.Players:FindFirstChild("TargetName") -- Replace with target selection
-        if targetPlayer and targetPlayer.Character then
-            game.Workspace.CurrentCamera.CameraSubject = targetPlayer.Character:FindFirstChild("Humanoid")
-        end
-    else
-        game.Workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-    end
+    -- View logic
 end)
-
--- Fly GUI Setup
-FlyGui.Parent = game.CoreGui
-local FlyFrame = Instance.new("Frame")
-local EnableFlyButton = Instance.new("TextButton")
-local DisableFlyButton = Instance.new("TextButton")
-local SpeedBox = Instance.new("TextBox")
-
-FlyFrame.Parent = FlyGui
-FlyFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-FlyFrame.Size = UDim2.new(0, 200, 0, 150)
-FlyFrame.Position = UDim2.new(0.8, 0, 0.2, 0)
-
-EnableFlyButton.Parent = FlyFrame
-EnableFlyButton.Text = "Enable Fly"
-EnableFlyButton.Size = UDim2.new(0, 180, 0, 40)
-
-DisableFlyButton.Parent = FlyFrame
-DisableFlyButton.Text = "Disable Fly"
-DisableFlyButton.Size = UDim2.new(0, 180, 0, 40)
-
-SpeedBox.Parent = FlyFrame
-SpeedBox.Text = "Speed: 50"
-SpeedBox.Size = UDim2.new(0, 180, 0, 40)
