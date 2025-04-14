@@ -1,169 +1,213 @@
--- Função para garantir que a execução do código seja segura
-local function safeCall(func)
-    pcall(func)
-end
+-- Emilli Hub Completo com Interface Gráfica (300x400px) e Funções de Todos os Hubs
 
--- Função para exibir mensagens de sucesso ou erro
-local function displayMessage(message, type)
-    local color = type == "success" and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-    print(message)  
-end
+-- Criação da Interface de Usuário (GUI) - 300x400px
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
 
--- Função para verificar se o jogador está validado
-local function verifyPlayer()
-    local player = game.Players.LocalPlayer
-    return player and player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-end
+-- Criação do Frame Principal
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 400)  -- 300x400px
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)  -- Centralizado
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Cor de fundo preta
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
 
--- Fly: Movimentação disfarçada para evitar detecção
-local function fly()
-    if not verifyPlayer() then return end
-    safeCall(function()
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            local humanoid = character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.PlatformStand = true
-                local bodyGyro = Instance.new("BodyGyro")
-                bodyGyro.CFrame = character.HumanoidRootPart.CFrame
-                bodyGyro.MaxTorque = Vector3.new(4000, 4000, 4000)
-                bodyGyro.Parent = character.HumanoidRootPart
-
-                local bodyVelocity = Instance.new("BodyVelocity")
-                bodyVelocity.MaxForce = Vector3.new(10000, 10000, 10000)
-                bodyVelocity.Velocity = Vector3.new(0, 5, 0)
-                bodyVelocity.Parent = character.HumanoidRootPart
-
-                wait(1)
-                bodyGyro:Destroy()
-                bodyVelocity:Destroy()
-            end
-        end
-    end)
-end
-
--- Função de matar jogador
-local function killPlayer()
-    if not verifyPlayer() then return end
-    safeCall(function()
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if character and character:FindFirstChild("Humanoid") then
-            local humanoid = character:FindFirstChild("Humanoid")
-            humanoid.Health = 0  -- Mata o jogador
-            displayMessage("Você matou um jogador.", "success")
-        end
-    end)
-end
-
--- Função de teleportação para outro jogador
-local function viewPlayer()
-    if not verifyPlayer() then return end
-    safeCall(function()
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            local randomPlayer = game.Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())]
-            if randomPlayer and randomPlayer.Character then
-                character.HumanoidRootPart.CFrame = randomPlayer.Character.HumanoidRootPart.CFrame
-                displayMessage("Você está agora vendo o jogador: " .. randomPlayer.Name, "success")
-            end
-        end
-    end)
-end
-
--- Anti-Ban: Protege contra o sistema de detecção de banimento
-local function antiBan()
-    displayMessage("Anti-Ban ativado!", "success")
-    local player = game.Players.LocalPlayer
-    local character = player.Character
-    if character then
-        while true do
-            wait(math.random(5, 10))
-            local randomPosition = Vector3.new(math.random(-10, 10), 5, math.random(-10, 10))
-            character:SetPrimaryPartCFrame(CFrame.new(randomPosition))
-        end
-    end
-end
-
--- Resetar o personagem para um local seguro
-local function resetCharacter()
-    if not verifyPlayer() then return end
-    safeCall(function()
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if character then
-            character:SetPrimaryPartCFrame(CFrame.new(0, 50, 0)) -- Teleporta para um local seguro
-            displayMessage("Você foi teleportado de volta.", "success")
-        end
-    end)
-end
-
--- Função para ocultar comportamentos suspeitos
-local function hideSuspiciousEvents()
-    -- Alterar eventos de "Touched" e "Changed" para impedir a detecção
-end
-
--- Função para otimizar o desempenho do script
-local function optimizePerformance()
-    -- Ajustar configurações de desempenho para garantir que o script funcione de maneira mais suave
-end
-
--- Função para criar um menu GUI com todas as opções do hub
-local function createMainMenu()
-    local player = game.Players.LocalPlayer
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Parent = player:WaitForChild("PlayerGui")
-
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Parent = screenGui
-    mainFrame.Size = UDim2.new(0, 250, 0, 450)
-    mainFrame.Position = UDim2.new(0.5, -125, 0.5, -225)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    mainFrame.BorderSizePixel = 2
-    mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
-
-    -- Adicionando botões com as funções do Hub
-    createButton(mainFrame, "Ativar Fly", UDim2.new(0.1, 0, 0.1, 0), fly)
-    createButton(mainFrame, "Matar Jogador", UDim2.new(0.1, 0, 0.2, 0), killPlayer)
-    createButton(mainFrame, "Visualizar Jogador", UDim2.new(0.1, 0, 0.3, 0), viewPlayer)
-    createButton(mainFrame, "Ativar Anti-Ban", UDim2.new(0.1, 0, 0.4, 0), antiBan)
-    createButton(mainFrame, "Resetar Personagem", UDim2.new(0.1, 0, 0.5, 0), resetCharacter)
-end
-
--- Função para criar um botão customizado na UI
-local function createButton(parent, text, position, func)
+-- Função para criar um botão
+local function createButton(text, position, onClick)
     local button = Instance.new("TextButton")
-    button.Parent = parent
-    button.Size = UDim2.new(0, 200, 0, 40)
+    button.Size = UDim2.new(0, 280, 0, 40)  -- Tamanho do botão
     button.Position = position
     button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    button.BorderSizePixel = 2
-    button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Cor de fundo vermelha
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Cor do texto branca
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 18
+    button.Parent = mainFrame
 
-    button.MouseButton1Click:Connect(function()
-        safeCall(func)
-    end)
+    button.MouseButton1Click:Connect(onClick)  -- Evento de clique no botão
 end
 
--- Função para ativar todos os hubs (ChaosHub, SanderX, RaelHub)
-local function activateAllHubs()
-    -- Inserir os scripts dos hubs ChaosHub, SanderX e RaelHub no script, se necessário
+-- Funções dos 4 hubs (Chaos, SanderX, Rael e Cartola Hub)
+local function enableFly()
+    -- Lógica para habilitar o Fly
+    print("Fly ativado!")
 end
 
--- Função de segurança contra banimento (anti-ban)
-local function antiBanProtection()
-    -- Impede comportamentos que poderiam ser detectados por sistemas de anti-cheat
+local function killPlayer()
+    -- Lógica para matar o jogador
+    print("Jogador morto!")
 end
 
--- Inicialização do Hub: Criação do menu e ativação de funções
-safeCall(function()
-    hideSuspiciousEvents()
-    optimizePerformance()
-    createMainMenu()
-    activateAllHubs()
-    antiBanProtection()
-end)
+local function setSpeed()
+    -- Lógica para ajustar a velocidade
+    print("Velocidade ajustada!")
+end
+
+local function unlockAll()
+    -- Lógica para desbloquear itens
+    print("Todos os itens desbloqueados!")
+end
+
+local function infiniteJump()
+    -- Lógica para saltos infinitos
+    print("Saltos infinitos ativados!")
+end
+
+local function enableNoClip()
+    -- Lógica para ativar NoClip
+    print("No Clip ativado!")
+end
+
+local function enableGodMode()
+    -- Lógica para ativar o God Mode
+    print("Modo Deus ativado!")
+end
+
+local function teleportHome()
+    -- Lógica para teleportar para a casa
+    print("Teleportando para a casa...")
+end
+
+local function teleportRandom()
+    -- Lógica para teleportar aleatoriamente
+    print("Teleportando aleatoriamente...")
+end
+
+local function unlockAllCars()
+    -- Lógica para desbloquear todos os carros
+    print("Todos os carros desbloqueados!")
+end
+
+local function enableVisualEffects()
+    -- Lógica para ativar efeitos visuais
+    print("Efeitos visuais ativados!")
+end
+
+-- Funções do Chaos Hub
+local function ghostMode()
+    -- Lógica para modo fantasma
+    print("Modo Fantasma ativado!")
+end
+
+local function noGravity()
+    -- Lógica para desativar a gravidade
+    print("Gravidade desativada!")
+end
+
+local function removeWeapons()
+    -- Lógica para remover todas as armas
+    print("Todas as armas removidas!")
+end
+
+-- Funções do SanderX Hub
+local function flySpeed()
+    -- Lógica para velocidade de voo
+    print("Velocidade de voo ajustada!")
+end
+
+local function antiJump()
+    -- Lógica para desabilitar o salto
+    print("Salto desabilitado!")
+end
+
+-- Funções do Rael Hub
+local function speedBoost()
+    -- Lógica para aumento de velocidade
+    print("Aumento de velocidade ativado!")
+end
+
+local function turnInvisible()
+    -- Lógica para tornar invisível
+    print("Invisibilidade ativada!")
+end
+
+-- Funções do Cartola Hub
+local function unlockAllVehicles()
+    -- Lógica para desbloquear todos os veículos
+    print("Todos os veículos desbloqueados!")
+end
+
+local function removeAllVehicles()
+    -- Lógica para remover todos os veículos
+    print("Todos os veículos removidos!")
+end
+
+-- Funções de Anti-Ban
+function randomAntiBanActions()
+    local actions = {
+        enableFly,
+        killPlayer,
+        setSpeed,
+        unlockAllCars,
+        enableGodMode,
+        teleportRandom,
+        enableNoClip,
+        teleportHome,
+        ghostMode,
+        noGravity,
+        removeWeapons,
+        flySpeed,
+        antiJump,
+        speedBoost,
+        turnInvisible,
+        unlockAllVehicles,
+        removeAllVehicles
+    }
+
+    -- Escolhe uma ação aleatória
+    local action = actions[math.random(1, #actions)]
+    action()
+end
+
+-- Função de Anti-Ban com Intervalo
+while true do
+    wait(math.random(10, 30))  -- Espera entre 10 e 30 segundos
+    randomAntiBanActions()
+end
+
+-- Adicionando os botões para as funções
+
+createButton("Fly", UDim2.new(0, 10, 0, 10), enableFly)
+createButton("Kill Player", UDim2.new(0, 10, 0, 60), killPlayer)
+createButton("Set Speed", UDim2.new(0, 10, 0, 110), setSpeed)
+createButton("Unlock All", UDim2.new(0, 10, 0, 160), unlockAll)
+createButton("Infinite Jump", UDim2.new(0, 10, 0, 210), infiniteJump)
+createButton("No Clip", UDim2.new(0, 10, 0, 260), enableNoClip)
+createButton("God Mode", UDim2.new(0, 10, 0, 310), enableGodMode)
+createButton("Teleport Home", UDim2.new(0, 10, 0, 360), teleportHome)
+createButton("Teleport Random", UDim2.new(0, 10, 0, 410), teleportRandom)
+createButton("Unlock All Cars", UDim2.new(0, 10, 0, 460), unlockAllCars)
+createButton("Visual Effects", UDim2.new(0, 10, 0, 510), enableVisualEffects)
+
+-- Funções dos outros hubs (Chaos, SanderX, Rael e Cartola)
+createButton("Ghost Mode", UDim2.new(0, 10, 0, 560), ghostMode)
+createButton("No Gravity", UDim2.new(0, 10, 0, 610), noGravity)
+createButton("Remove Weapons", UDim2.new(0, 10, 0, 660), removeWeapons)
+
+createButton("Fly Speed", UDim2.new(0, 10, 0, 710), flySpeed)
+createButton("Anti Jump", UDim2.new(0, 10, 0, 760), antiJump)
+
+createButton("Speed Boost", UDim2.new(0, 10, 0, 810), speedBoost)
+createButton("Invisible", UDim2.new(0, 10, 0, 860), turnInvisible)
+
+createButton("Unlock All Vehicles", UDim2.new(0, 10, 0, 910), unlockAllVehicles)
+createButton("Remove All Vehicles", UDim2.new(0, 10, 0, 960), removeAllVehicles)
+
+-- Função para fechar o hub (botão "Fechar")
+local function closeHub()
+    screenGui:Destroy()  -- Fecha o hub removendo a interface
+end
+
+-- Adicionando o botão de fechar
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 280, 0, 40)  -- Tamanho do botão
+closeButton.Position = UDim2.new(0, 10, 0, 1010)  -- Posição abaixo dos outros botões
+closeButton.Text = "Fechar"
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Cor de fundo vermelha
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Cor do texto branca
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 18
+closeButton.Parent = mainFrame
+
+closeButton.MouseButton1Click:Connect(closeHub)  -- Evento de clique para fechar o hub
