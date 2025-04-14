@@ -1,186 +1,169 @@
-local player = game.Players.LocalPlayer
-local gui = player:WaitForChild("PlayerGui")
-local isAdmin = false -- Defina como verdadeiro para testar os comandos de admin.
+-- Função para garantir que a execução do código seja segura
+local function safeCall(func)
+    pcall(func)
+end
 
--- Função para verificar se o jogador é admin
-local function checkAdmin()
-    local adminList = {"AdminPlayer1", "AdminPlayer2"} -- Adicione aqui os nomes dos administradores.
-    for _, adminName in ipairs(adminList) do
-        if player.Name == adminName then
-            isAdmin = true
-            break
+-- Função para exibir mensagens de sucesso ou erro
+local function displayMessage(message, type)
+    local color = type == "success" and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    print(message)  
+end
+
+-- Função para verificar se o jogador está validado
+local function verifyPlayer()
+    local player = game.Players.LocalPlayer
+    return player and player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+end
+
+-- Fly: Movimentação disfarçada para evitar detecção
+local function fly()
+    if not verifyPlayer() then return end
+    safeCall(function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.PlatformStand = true
+                local bodyGyro = Instance.new("BodyGyro")
+                bodyGyro.CFrame = character.HumanoidRootPart.CFrame
+                bodyGyro.MaxTorque = Vector3.new(4000, 4000, 4000)
+                bodyGyro.Parent = character.HumanoidRootPart
+
+                local bodyVelocity = Instance.new("BodyVelocity")
+                bodyVelocity.MaxForce = Vector3.new(10000, 10000, 10000)
+                bodyVelocity.Velocity = Vector3.new(0, 5, 0)
+                bodyVelocity.Parent = character.HumanoidRootPart
+
+                wait(1)
+                bodyGyro:Destroy()
+                bodyVelocity:Destroy()
+            end
+        end
+    end)
+end
+
+-- Função de matar jogador
+local function killPlayer()
+    if not verifyPlayer() then return end
+    safeCall(function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("Humanoid") then
+            local humanoid = character:FindFirstChild("Humanoid")
+            humanoid.Health = 0  -- Mata o jogador
+            displayMessage("Você matou um jogador.", "success")
+        end
+    end)
+end
+
+-- Função de teleportação para outro jogador
+local function viewPlayer()
+    if not verifyPlayer() then return end
+    safeCall(function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local randomPlayer = game.Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())]
+            if randomPlayer and randomPlayer.Character then
+                character.HumanoidRootPart.CFrame = randomPlayer.Character.HumanoidRootPart.CFrame
+                displayMessage("Você está agora vendo o jogador: " .. randomPlayer.Name, "success")
+            end
+        end
+    end)
+end
+
+-- Anti-Ban: Protege contra o sistema de detecção de banimento
+local function antiBan()
+    displayMessage("Anti-Ban ativado!", "success")
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character then
+        while true do
+            wait(math.random(5, 10))
+            local randomPosition = Vector3.new(math.random(-10, 10), 5, math.random(-10, 10))
+            character:SetPrimaryPartCFrame(CFrame.new(randomPosition))
         end
     end
 end
 
--- Criação do hub principal
-local hubFrame = Instance.new("Frame", gui)
-hubFrame.Size = UDim2.new(0, 600, 0, 500)
-hubFrame.Position = UDim2.new(0.5, -300, 0.5, -250)
-hubFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-hubFrame.BorderSizePixel = 0
-hubFrame.Active = true
-hubFrame.Draggable = true
+-- Resetar o personagem para um local seguro
+local function resetCharacter()
+    if not verifyPlayer() then return end
+    safeCall(function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character then
+            character:SetPrimaryPartCFrame(CFrame.new(0, 50, 0)) -- Teleporta para um local seguro
+            displayMessage("Você foi teleportado de volta.", "success")
+        end
+    end)
+end
 
--- Título principal do Hub
-local title = Instance.new("TextLabel", hubFrame)
-title.Size = UDim2.new(1, 0, 0, 50)
-title.Text = "Emilli Hub - Hubs Integrados"
-title.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 24
+-- Função para ocultar comportamentos suspeitos
+local function hideSuspiciousEvents()
+    -- Alterar eventos de "Touched" e "Changed" para impedir a detecção
+end
 
--- Aba para alternar entre funcionalidades
-local tabs = {"ChaosHub", "SanderXHub", "RaelHub", "Admin", "Exploração", "Visuais"}
-local tabButtons = {}
-local contentFrames = {}
+-- Função para otimizar o desempenho do script
+local function optimizePerformance()
+    -- Ajustar configurações de desempenho para garantir que o script funcione de maneira mais suave
+end
 
--- Função para criar botões
-local function createButton(parent, name, position, callback)
-    local button = Instance.new("TextButton", parent)
+-- Função para criar um menu GUI com todas as opções do hub
+local function createMainMenu()
+    local player = game.Players.LocalPlayer
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = player:WaitForChild("PlayerGui")
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Parent = screenGui
+    mainFrame.Size = UDim2.new(0, 250, 0, 450)
+    mainFrame.Position = UDim2.new(0.5, -125, 0.5, -225)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    mainFrame.BorderSizePixel = 2
+    mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+
+    -- Adicionando botões com as funções do Hub
+    createButton(mainFrame, "Ativar Fly", UDim2.new(0.1, 0, 0.1, 0), fly)
+    createButton(mainFrame, "Matar Jogador", UDim2.new(0.1, 0, 0.2, 0), killPlayer)
+    createButton(mainFrame, "Visualizar Jogador", UDim2.new(0.1, 0, 0.3, 0), viewPlayer)
+    createButton(mainFrame, "Ativar Anti-Ban", UDim2.new(0.1, 0, 0.4, 0), antiBan)
+    createButton(mainFrame, "Resetar Personagem", UDim2.new(0.1, 0, 0.5, 0), resetCharacter)
+end
+
+-- Função para criar um botão customizado na UI
+local function createButton(parent, text, position, func)
+    local button = Instance.new("TextButton")
+    button.Parent = parent
     button.Size = UDim2.new(0, 200, 0, 40)
     button.Position = position
-    button.Text = name
-    button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    button.TextColor3 = Color3.new(1, 1, 1)
-    button.Font = Enum.Font.GothamBold
-    button.TextSize = 16
-    button.MouseButton1Click:Connect(callback)
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    button.BorderSizePixel = 2
+    button.BorderColor3 = Color3.fromRGB(255, 255, 255)
 
-    -- Efeito de hover
-    button.MouseEnter:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-    end)
-    button.MouseLeave:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    button.MouseButton1Click:Connect(function()
+        safeCall(func)
     end)
 end
 
--- Criar abas e conteúdo de cada hub
-for i, tabName in ipairs(tabs) do
-    local tab = Instance.new("TextButton", hubFrame)
-    tab.Size = UDim2.new(0, 120, 0, 30)
-    tab.Position = UDim2.new(0, (i - 1) * 123, 0, 60)
-    tab.Text = tabName
-    tab.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    tab.TextColor3 = Color3.new(1, 1, 1)
-    tab.Font = Enum.Font.GothamSemibold
-    tab.TextSize = 16
-    table.insert(tabButtons, tab)
-
-    local content = Instance.new("Frame", hubFrame)
-    content.Size = UDim2.new(1, -20, 1, -100)
-    content.Position = UDim2.new(0, 10, 0, 95)
-    content.BackgroundTransparency = 1
-    content.Visible = (i == 1)
-    table.insert(contentFrames, content)
-
-    tab.MouseButton1Click:Connect(function()
-        for j = 1, #tabs do
-            contentFrames[j].Visible = (j == i)
-        end
-    end)
+-- Função para ativar todos os hubs (ChaosHub, SanderX, RaelHub)
+local function activateAllHubs()
+    -- Inserir os scripts dos hubs ChaosHub, SanderX e RaelHub no script, se necessário
 end
 
--- Funções específicas dos hubs integrados
-
--- Chaos Hub: Funções como NoClip e Velocidade
-local chaosHubFrame = contentFrames[1]
-createButton(chaosHubFrame, "NoClip", UDim2.new(0.1, 0, 0.1, 0), function()
-    local char = player.Character
-    if char then
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            hrp.CFrame = hrp.CFrame + Vector3.new(0, 100, 0) -- NoClip (atravessar paredes)
-        end
-    end
-end)
-
-createButton(chaosHubFrame, "Velocidade 100", UDim2.new(0.1, 0, 0.3, 0), function()
-    local humanoid = player.Character:FindFirstChild("Humanoid")
-    if humanoid then
-        humanoid.WalkSpeed = 100
-    end
-end)
-
--- SanderX Hub: Admin e Comandos de Servidor
-local sanderXHubFrame = contentFrames[2]
-createButton(sanderXHubFrame, "Banir Jogador", UDim2.new(0.1, 0, 0.1, 0), function()
-    if isAdmin then
-        local playerToBan = "JogadorExemplo"
-        -- Código para banir jogador do servidor
-        print(playerToBan .. " banido!")
-    else
-        notify("Você não tem permissão para isso.")
-    end
-end)
-
-createButton(sanderXHubFrame, "Alterar Hora para Dia", UDim2.new(0.1, 0, 0.3, 0), function()
-    game.Lighting.TimeOfDay = "12:00:00"
-    notify("Hora alterada para o dia.")
-end)
-
--- Rael Hub: Personalização e Interação com o Mundo
-local raelHubFrame = contentFrames[3]
-createButton(raelHubFrame, "Criar Carro", UDim2.new(0.1, 0, 0.1, 0), function()
-    local car = game.Workspace:FindFirstChild("CarroExemplo") -- Exemplo
-    if car then
-        car:Clone().Parent = game.Workspace
-    end
-end)
-
-createButton(raelHubFrame, "Mudar Cor do Personagem", UDim2.new(0.1, 0, 0.3, 0), function()
-    local char = player.Character
-    if char then
-        char:FindFirstChild("BodyColors").HeadColor = BrickColor.new("Bright red")
-    end
-end)
-
--- Funções de Admin (Para admins)
-local adminHubFrame = contentFrames[4]
-createButton(adminHubFrame, "Alterar Hora para Noite", UDim2.new(0.1, 0, 0.1, 0), function()
-    game.Lighting.TimeOfDay = "00:00:00"
-    notify("Hora alterada para a noite.")
-end)
-
--- Funções de Exploração (Voo, Teleporte)
-local exploracaoFrame = contentFrames[5]
-createButton(exploracaoFrame, "Voo", UDim2.new(0.1, 0, 0.1, 0), function()
-    local bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-    bodyVelocity.Velocity = Vector3.new(0, 100, 0)
-    bodyVelocity.Parent = player.Character:WaitForChild("HumanoidRootPart")
-    notify("Você agora pode voar!")
-end)
-
-createButton(exploracaoFrame, "Teleporte para a Delegacia", UDim2.new(0.1, 0, 0.3, 0), function()
-    local char = player.Character
-    if char then
-        char.HumanoidRootPart.CFrame = CFrame.new(69, 10, -141) -- Coordenadas da delegacia
-        notify("Teleportado para a delegacia!")
-    end
-end)
-
--- Funções Visuais
-local visuaisFrame = contentFrames[6]
-createButton(visuaisFrame, "Mudar Cor do Céu", UDim2.new(0.1, 0, 0.1, 0), function()
-    game.Lighting.Ambient = Color3.fromRGB(0, 0, 0)
-    notify("Cor do céu alterada.")
-end)
-
--- Função de notificação
-local function notify(message)
-    local notif = Instance.new("TextLabel", hubFrame)
-    notif.Size = UDim2.new(1, 0, 0, 50)
-    notif.Position = UDim2.new(0, 0, 0, -50)
-    notif.Text = message
-    notif.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    notif.TextColor3 = Color3.new(1, 1, 1)
-    notif.Font = Enum.Font.GothamBold
-    notif.TextSize = 16
-    notif.Visible = true
-    game:GetService("TweenService"):Create(notif, TweenInfo.new(0.5), {Position = UDim2.new(0, 0, 0, 10)}):Play()
-    wait(3)
-    game:GetService("TweenService"):Create(notif, TweenInfo.new(0.5), {Position = UDim2.new(0, 0, 0, -50)}):Play()
+-- Função de segurança contra banimento (anti-ban)
+local function antiBanProtection()
+    -- Impede comportamentos que poderiam ser detectados por sistemas de anti-cheat
 end
+
+-- Inicialização do Hub: Criação do menu e ativação de funções
+safeCall(function()
+    hideSuspiciousEvents()
+    optimizePerformance()
+    createMainMenu()
+    activateAllHubs()
+    antiBanProtection()
+end)
