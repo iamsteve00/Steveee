@@ -1,213 +1,174 @@
--- Emilli Hub Completo com Interface Gráfica (300x400px) e Funções de Todos os Hubs
+-- Espera o jogo carregar
+if not game:IsLoaded() then game.Loaded:Wait() end
 
--- Criação da Interface de Usuário (GUI) - 300x400px
-local player = game.Players.LocalPlayer
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player.PlayerGui
+local CoreGui = game:GetService("CoreGui")
+if CoreGui:FindFirstChild("EmilliHub") then CoreGui.EmilliHub:Destroy() end
 
--- Criação do Frame Principal
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 400)  -- 300x400px
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)  -- Centralizado
-mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Cor de fundo preta
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "EmilliHub"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = CoreGui
 
--- Função para criar um botão
-local function createButton(text, position, onClick)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 280, 0, 40)  -- Tamanho do botão
-    button.Position = position
-    button.Text = text
-    button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Cor de fundo vermelha
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Cor do texto branca
-    button.Font = Enum.Font.GothamBold
-    button.TextSize = 18
-    button.Parent = mainFrame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 500)
+frame.Position = UDim2.new(0.5, -200, 0.5, -250)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BorderSizePixel = 0
+frame.Parent = gui
 
-    button.MouseButton1Click:Connect(onClick)  -- Evento de clique no botão
+local frameCorner = Instance.new("UICorner", frame)
+frameCorner.CornerRadius = UDim.new(0, 6)
+
+-- Título
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 40)
+titleBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = frame
+
+local titleCorner = Instance.new("UICorner", titleBar)
+titleCorner.CornerRadius = UDim.new(0, 6)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -40, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Emilli Hub"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = titleBar
+
+-- Botão de fechar
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 5)
+close.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+close.Text = "X"
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Font = Enum.Font.GothamBold
+close.TextSize = 14
+close.Parent = titleBar
+
+local closeCorner = Instance.new("UICorner", close)
+closeCorner.CornerRadius = UDim.new(1, 0)
+
+close.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+-- Menu lateral de categorias
+local categoryMenu = Instance.new("Frame")
+categoryMenu.Size = UDim2.new(0, 100, 1, -40)
+categoryMenu.Position = UDim2.new(0, 0, 0, 40)
+categoryMenu.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+categoryMenu.BorderSizePixel = 0
+categoryMenu.Parent = frame
+
+local menuCorner = Instance.new("UICorner", categoryMenu)
+menuCorner.CornerRadius = UDim.new(0, 6)
+
+-- Área de conteúdo
+local content = Instance.new("Frame")
+content.Size = UDim2.new(1, -100, 1, -40)
+content.Position = UDim2.new(0, 100, 0, 40)
+content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+content.BorderSizePixel = 0
+content.Parent = frame
+
+local contentCorner = Instance.new("UICorner", content)
+contentCorner.CornerRadius = UDim.new(0, 6)
+
+local pages = {}
+
+local function createPage(name)
+	local page = Instance.new("ScrollingFrame")
+	page.Size = UDim2.new(1, 0, 1, 0)
+	page.CanvasSize = UDim2.new(0, 0, 0, 0)
+	page.BackgroundTransparency = 1
+	page.ScrollBarThickness = 5
+	page.Visible = false
+	page.Parent = content
+	pages[name] = page
+	return page
 end
 
--- Funções dos 4 hubs (Chaos, SanderX, Rael e Cartola Hub)
-local function enableFly()
-    -- Lógica para habilitar o Fly
-    print("Fly ativado!")
+local function switchPage(name)
+	for i, page in pairs(pages) do
+		page.Visible = (i == name)
+	end
 end
 
-local function killPlayer()
-    -- Lógica para matar o jogador
-    print("Jogador morto!")
+local function createCategory(name)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, 0, 0, 30)
+	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	btn.Text = name
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 14
+	btn.Parent = categoryMenu
+
+	local btnCorner = Instance.new("UICorner", btn)
+	btnCorner.CornerRadius = UDim.new(0, 6)
+
+	local page = createPage(name)
+
+	btn.MouseButton1Click:Connect(function()
+		switchPage(name)
+	end)
+
+	return page
 end
 
-local function setSpeed()
-    -- Lógica para ajustar a velocidade
-    print("Velocidade ajustada!")
+-- Categorias
+local flyPage = createCategory("Fly")
+local playerPage = createCategory("Player")
+local visualPage = createCategory("Visual")
+local teleportPage = createCategory("TP")
+local miscPage = createCategory("Outros")
+
+-- Exibir primeira categoria
+switchPage("Fly")
+
+-- Exemplo de botão em uma página
+local function createOption(page, name, callback)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, -10, 0, 30)
+	btn.Position = UDim2.new(0, 5, 0, #page:GetChildren() * 35)
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	btn.Text = name
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 14
+	btn.Parent = page
+	page.CanvasSize = UDim2.new(0, 0, 0, #page:GetChildren() * 35)
+
+	local btnCorner = Instance.new("UICorner", btn)
+	btnCorner.CornerRadius = UDim.new(0, 6)
+
+	btn.MouseButton1Click:Connect(callback)
 end
 
-local function unlockAll()
-    -- Lógica para desbloquear itens
-    print("Todos os itens desbloqueados!")
-end
+-- Adiciona opções de exemplo
+createOption(flyPage, "Ativar Fly", function()
+	print("Fly ligado")
+end)
 
-local function infiniteJump()
-    -- Lógica para saltos infinitos
-    print("Saltos infinitos ativados!")
-end
+createOption(playerPage, "Kill Player", function()
+	print("Kill ativado")
+end)
 
-local function enableNoClip()
-    -- Lógica para ativar NoClip
-    print("No Clip ativado!")
-end
+createOption(visualPage, "ESP Players", function()
+	print("ESP ligado")
+end)
 
-local function enableGodMode()
-    -- Lógica para ativar o God Mode
-    print("Modo Deus ativado!")
-end
+createOption(teleportPage, "Ir para Hospital", function()
+	print("Teleport para Hospital")
+end)
 
-local function teleportHome()
-    -- Lógica para teleportar para a casa
-    print("Teleportando para a casa...")
-end
-
-local function teleportRandom()
-    -- Lógica para teleportar aleatoriamente
-    print("Teleportando aleatoriamente...")
-end
-
-local function unlockAllCars()
-    -- Lógica para desbloquear todos os carros
-    print("Todos os carros desbloqueados!")
-end
-
-local function enableVisualEffects()
-    -- Lógica para ativar efeitos visuais
-    print("Efeitos visuais ativados!")
-end
-
--- Funções do Chaos Hub
-local function ghostMode()
-    -- Lógica para modo fantasma
-    print("Modo Fantasma ativado!")
-end
-
-local function noGravity()
-    -- Lógica para desativar a gravidade
-    print("Gravidade desativada!")
-end
-
-local function removeWeapons()
-    -- Lógica para remover todas as armas
-    print("Todas as armas removidas!")
-end
-
--- Funções do SanderX Hub
-local function flySpeed()
-    -- Lógica para velocidade de voo
-    print("Velocidade de voo ajustada!")
-end
-
-local function antiJump()
-    -- Lógica para desabilitar o salto
-    print("Salto desabilitado!")
-end
-
--- Funções do Rael Hub
-local function speedBoost()
-    -- Lógica para aumento de velocidade
-    print("Aumento de velocidade ativado!")
-end
-
-local function turnInvisible()
-    -- Lógica para tornar invisível
-    print("Invisibilidade ativada!")
-end
-
--- Funções do Cartola Hub
-local function unlockAllVehicles()
-    -- Lógica para desbloquear todos os veículos
-    print("Todos os veículos desbloqueados!")
-end
-
-local function removeAllVehicles()
-    -- Lógica para remover todos os veículos
-    print("Todos os veículos removidos!")
-end
-
--- Funções de Anti-Ban
-function randomAntiBanActions()
-    local actions = {
-        enableFly,
-        killPlayer,
-        setSpeed,
-        unlockAllCars,
-        enableGodMode,
-        teleportRandom,
-        enableNoClip,
-        teleportHome,
-        ghostMode,
-        noGravity,
-        removeWeapons,
-        flySpeed,
-        antiJump,
-        speedBoost,
-        turnInvisible,
-        unlockAllVehicles,
-        removeAllVehicles
-    }
-
-    -- Escolhe uma ação aleatória
-    local action = actions[math.random(1, #actions)]
-    action()
-end
-
--- Função de Anti-Ban com Intervalo
-while true do
-    wait(math.random(10, 30))  -- Espera entre 10 e 30 segundos
-    randomAntiBanActions()
-end
-
--- Adicionando os botões para as funções
-
-createButton("Fly", UDim2.new(0, 10, 0, 10), enableFly)
-createButton("Kill Player", UDim2.new(0, 10, 0, 60), killPlayer)
-createButton("Set Speed", UDim2.new(0, 10, 0, 110), setSpeed)
-createButton("Unlock All", UDim2.new(0, 10, 0, 160), unlockAll)
-createButton("Infinite Jump", UDim2.new(0, 10, 0, 210), infiniteJump)
-createButton("No Clip", UDim2.new(0, 10, 0, 260), enableNoClip)
-createButton("God Mode", UDim2.new(0, 10, 0, 310), enableGodMode)
-createButton("Teleport Home", UDim2.new(0, 10, 0, 360), teleportHome)
-createButton("Teleport Random", UDim2.new(0, 10, 0, 410), teleportRandom)
-createButton("Unlock All Cars", UDim2.new(0, 10, 0, 460), unlockAllCars)
-createButton("Visual Effects", UDim2.new(0, 10, 0, 510), enableVisualEffects)
-
--- Funções dos outros hubs (Chaos, SanderX, Rael e Cartola)
-createButton("Ghost Mode", UDim2.new(0, 10, 0, 560), ghostMode)
-createButton("No Gravity", UDim2.new(0, 10, 0, 610), noGravity)
-createButton("Remove Weapons", UDim2.new(0, 10, 0, 660), removeWeapons)
-
-createButton("Fly Speed", UDim2.new(0, 10, 0, 710), flySpeed)
-createButton("Anti Jump", UDim2.new(0, 10, 0, 760), antiJump)
-
-createButton("Speed Boost", UDim2.new(0, 10, 0, 810), speedBoost)
-createButton("Invisible", UDim2.new(0, 10, 0, 860), turnInvisible)
-
-createButton("Unlock All Vehicles", UDim2.new(0, 10, 0, 910), unlockAllVehicles)
-createButton("Remove All Vehicles", UDim2.new(0, 10, 0, 960), removeAllVehicles)
-
--- Função para fechar o hub (botão "Fechar")
-local function closeHub()
-    screenGui:Destroy()  -- Fecha o hub removendo a interface
-end
-
--- Adicionando o botão de fechar
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 280, 0, 40)  -- Tamanho do botão
-closeButton.Position = UDim2.new(0, 10, 0, 1010)  -- Posição abaixo dos outros botões
-closeButton.Text = "Fechar"
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Cor de fundo vermelha
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Cor do texto branca
-closeButton.Font = Enum.Font.GothamBold
-closeButton.TextSize = 18
-closeButton.Parent = mainFrame
-
-closeButton.MouseButton1Click:Connect(closeHub)  -- Evento de clique para fechar o hub
+createOption(miscPage, "Speed x2", function()
+	print("Speed 2x")
+end)
