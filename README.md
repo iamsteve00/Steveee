@@ -1,97 +1,210 @@
+-- Emilli Hub Interface Script com Abas e Funções
+
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
-local Sidebar = Instance.new("Frame")
-local ContentFrame = Instance.new("ScrollingFrame")
-local UICorner = Instance.new("UICorner")
-local UIListLayout = Instance.new("UIListLayout")
-local CloseButton = Instance.new("TextButton")
+local TopBar = Instance.new("Frame")
 local MinimizeButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
+local SideBar = Instance.new("Frame")
+local Content = Instance.new("Frame")
+local miniBtn = Instance.new("TextButton")
 
--- Configurar ScreenGui
-ScreenGui.Name = "EmilliHub"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
 
--- Frame Principal
+-- MAIN FRAME
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
 MainFrame.Size = UDim2.new(0, 600, 0, 400)
-MainFrame.Position = UDim2.new(0.2, 0, 0.2, 0)
+MainFrame.Active = true
+MainFrame.Draggable = true
 
--- Sidebar
-Sidebar.Name = "Sidebar"
-Sidebar.Parent = MainFrame
-Sidebar.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-Sidebar.Size = UDim2.new(0, 120, 1, 0)
+-- TOP BAR
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TopBar.Size = UDim2.new(1, 0, 0, 30)
 
--- Botões da Sidebar (exemplo)
-local sidebarOptions = {"Info", "Scripts Trolls", "Troll Player", "Avatar", "Casa", "Audio All", "Lag Server FE", "Nomes"}
-for _, name in pairs(sidebarOptions) do
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(1, 0, 0, 30)
-	btn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-	btn.Text = name
-	btn.Font = Enum.Font.SourceSans
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.TextSize = 14
-	btn.Parent = Sidebar
-end
+-- MINIMIZE BUTTON
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = TopBar
+MinimizeButton.Text = "-"
+MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -60, 0, 0)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.BorderSizePixel = 0
 
--- Área de Conteúdo
-ContentFrame.Name = "ContentFrame"
-ContentFrame.Parent = MainFrame
-ContentFrame.Position = UDim2.new(0, 130, 0, 40)
-ContentFrame.Size = UDim2.new(1, -140, 1, -50)
-ContentFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-ContentFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
-ContentFrame.ScrollBarThickness = 6
-
--- Layout dos botões
-UIListLayout.Parent = ContentFrame
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 5)
-
--- Botões de exemplo com ícone
-local buttons = {"Fling Boat", "Disable Fling Boat", "Kill All Bus", "House Ban Kill All", "Fling Boat All", "Bring All [melhor]"}
-for _, text in pairs(buttons) do
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(1, -10, 0, 40)
-	btn.Text = text
-	btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	btn.Font = Enum.Font.SourceSansBold
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.TextSize = 18
-	btn.Parent = ContentFrame
-
-	local icon = Instance.new("ImageLabel")
-	icon.Size = UDim2.new(0, 24, 0, 24)
-	icon.Position = UDim2.new(1, -30, 0.5, -12)
-	icon.BackgroundTransparency = 1
-	icon.Image = "rbxassetid://3926305904" -- ícone fingerprint (se quiser outro, posso trocar)
-	icon.ImageRectOffset = Vector2.new(324, 4)
-	icon.ImageRectSize = Vector2.new(36, 36)
-	icon.Parent = btn
-end
-
--- Botões de fechar e minimizar
+-- CLOSE BUTTON
 CloseButton.Name = "CloseButton"
-CloseButton.Parent = MainFrame
-CloseButton.Position = UDim2.new(1, -35, 0, 5)
-CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Parent = TopBar
 CloseButton.Text = "X"
-CloseButton.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
-CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -30, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.BorderSizePixel = 0
+
+-- SIDEBAR
+SideBar.Name = "SideBar"
+SideBar.Parent = MainFrame
+SideBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+SideBar.Position = UDim2.new(0, 0, 0, 30)
+SideBar.Size = UDim2.new(0, 150, 1, -30)
+
+-- CONTENT FRAME
+Content.Name = "Content"
+Content.Parent = MainFrame
+Content.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Content.Position = UDim2.new(0, 150, 0, 30)
+Content.Size = UDim2.new(1, -150, 1, -30)
+
+-- MINI BUTTON (para restaurar a interface)
+miniBtn.Name = "MiniBtn"
+miniBtn.Parent = ScreenGui
+miniBtn.Size = UDim2.new(0, 50, 0, 50)
+miniBtn.Position = UDim2.new(0.5, -25, 0.5, -25)
+miniBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+miniBtn.Visible = false
+miniBtn.Text = ""
+
+-- E IMAGE ICON (no mini botão)
+local icon = Instance.new("ImageLabel", miniBtn)
+icon.Size = UDim2.new(1, 0, 1, 0)
+icon.Position = UDim2.new(0, 0, 0, 0)
+icon.BackgroundTransparency = 1
+icon.Image = "rbxassetid://ID_DA_IMAGEM"  -- Coloque o ID real aqui
+
+-- DRAG MINI BUTTON
+miniBtn.Active = true
+miniBtn.Draggable = true
+
+-- FUNÇÕES
+
+-- Minimizar a interface
+MinimizeButton.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	miniBtn.Visible = true
+end)
+
+-- Restaurar a interface
+miniBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = true
+	miniBtn.Visible = false
+end)
+
+-- Fechar a interface
 CloseButton.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
-MinimizeButton.Name = "MinimizeButton"
-MinimizeButton.Parent = MainFrame
-MinimizeButton.Position = UDim2.new(1, -70, 0, 5)
-MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
-MinimizeButton.Text = "-"
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.MouseButton1Click:Connect(function()
-	MainFrame.Visible = false
-end)
+-- ABAS
+
+-- Criando as abas na barra lateral
+local tab1 = Instance.new("TextButton")
+tab1.Parent = SideBar
+tab1.Size = UDim2.new(1, 0, 0, 50)
+tab1.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+tab1.Text = "Funções de Jogo"
+tab1.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab1.TextSize = 18
+tab1.BorderSizePixel = 0
+
+local tab2 = Instance.new("TextButton")
+tab2.Parent = SideBar
+tab2.Size = UDim2.new(1, 0, 0, 50)
+tab2.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+tab2.Text = "Comandos Admin"
+tab2.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab2.TextSize = 18
+tab2.BorderSizePixel = 0
+
+local tab3 = Instance.new("TextButton")
+tab3.Parent = SideBar
+tab3.Size = UDim2.new(1, 0, 0, 50)
+tab3.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+tab3.Text = "Visual Features"
+tab3.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab3.TextSize = 18
+tab3.BorderSizePixel = 0
+
+local tab4 = Instance.new("TextButton")
+tab4.Parent = SideBar
+tab4.Size = UDim2.new(1, 0, 0, 50)
+tab4.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+tab4.Text = "Avançado"
+tab4.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab4.TextSize = 18
+tab4.BorderSizePixel = 0
+
+-- ABAS INTERATIVAS
+local currentTab = nil  -- Para saber qual aba está ativa
+
+-- Função para mudar o conteúdo dependendo da aba selecionada
+local function setTabContent(tab)
+	if currentTab then
+		currentTab.BackgroundColor3 = Color3.fromRGB(35, 35, 35)  -- Cor padrão das abas
+	end
+	tab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)  -- Cor ativa da aba
+	currentTab = tab
+	
+	-- Limpa o conteúdo atual
+	for _, child in pairs(Content:GetChildren()) do
+		child:Destroy()
+	end
+	
+	-- Adiciona conteúdo à aba
+	if tab == tab1 then
+		-- Funções de Jogo
+		local btnFly = Instance.new("TextButton")
+		btnFly.Parent = Content
+		btnFly.Size = UDim2.new(1, 0, 0, 50)
+		btnFly.Text = "Fly"
+		btnFly.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btnFly.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+		btnFly.TextSize = 18
+		btnFly.BorderSizePixel = 0
+		
+		btnFly.MouseButton1Click:Connect(function()
+			print("Fly ativado!")
+		end)
+
+		local btnSpeed = Instance.new("TextButton")
+		btnSpeed.Parent = Content
+		btnSpeed.Size = UDim2.new(1, 0, 0, 50)
+		btnSpeed.Text = "Speed"
+		btnSpeed.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btnSpeed.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+		btnSpeed.TextSize = 18
+		btnSpeed.BorderSizePixel = 0
+		
+		btnSpeed.MouseButton1Click:Connect(function()
+			print("Speed ativado!")
+		end)
+
+		-- Adicione mais funções de jogo aqui
+
+	elseif tab == tab2 then
+		-- Comandos Admin
+		local btnKick = Instance.new("TextButton")
+		btnKick.Parent = Content
+		btnKick.Size = UDim2.new(1, 0, 0, 50)
+		btnKick.Text = "Kick Player"
+		btnKick.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btnKick.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+		btnKick.TextSize = 18
+		btnKick.BorderSizePixel = 0
+		
+		btnKick.MouseButton1Click:Connect(function()
+			print("Kick Player executado!")
+		end)
+
+		local btnBan = Instance.new("TextButton")
+		btnBan.Parent = Content
+		btnBan.Size = UDim2.new(1, 0, 0, 50)
+		btnBan.Text = "Ban Player"
+		btnBan.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btnBan.BackgroundColor3 = Color
